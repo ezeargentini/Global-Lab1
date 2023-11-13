@@ -1,0 +1,115 @@
+*Examen Global Laboratorio Ezequiel Argentini COmision 4 - C
+
+Magneto quiere reclutar la mayor cantidad de mutantes para poder luchar contra los X-Mens.
+Te ha contratado a ti para que desarrolles un proyecto que detecte si un humano es mutante basándose en su secuencia de ADN.
+Para eso te ha pedido crear un programa con un método o función con la siguiente firma:
+boolean isMutant(String[] dna);
+En donde recibirás como parámetro un array de Strings que representan cada fila de una tabla de (6x6) con la secuencia del ADN. Las letras de los Strings solo pueden ser: (A,T,C,G), las cuales representa cada base nitrogenada del ADN.
+Sabrás si un humano es mutante, si encuentras MAS DE UNA SECUNCIA de cuatro letras iguales, de forma oblicua, horizontal o vertical.
+
+Ejemplo (Caso mutante):
+
+String[] dna = {"ATGCGA","CAGTGC","TTATGT","AGAAGG","CCCCTA","TCACTG"};
+Para la primera Matriz de la derecha!!!
+En este caso el llamado a la función isMutant(dna) devuelve “true”. Desarrolla el algoritmo de la manera más eficiente posible.
+Ingrese por teclado las filas de la matrz, cargando las mismas.
+ ( Teniendo en cuenta  casos para que sea mutante y casos para que no lo sea-,
+Una vez cargada correctamente la misma, aplique una función que verifique si hay presencia en la matriz de mutantes o no y que la misma le devuelva el resultado al usuario.
+Subir el proyecto con los casos de pruebas a git hub.
+
+Casos de prueba: [‘ATGCGA’,’CAGTGC’,’TTATGT’,’AGAAGG’,’CCCCTA’,’TCACTG’] Positivo
+[‘AAACGA’,’CAGTGC’,’TTTTGT’,’CGTACA’,’CTACTA’,’TCACTT’] Positivo
+[‘ATGCGA’,’CAGTGC’,’TTATTT’,’AGACGT’,’CGCTCC’,’TCACTG’] Negativa
+[‘ATGCGA’,’CAGTGC’,’SSATTT’,’AGACGT’,’CGEEEF’,’TCACTG’] Erronea
+*/
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+
+    public static boolean isMutant(List<String> dnaList) {
+        // Convertir la lista de ADN a una matriz de 6x6
+        String[][] dnaMatrix = new String[6][6];
+        for (int i = 0; i < 6; i++) {
+            dnaMatrix[i] = dnaList.get(i).split("");
+        }
+
+        // Verificar horizontalmente
+        for (String[] row : dnaMatrix) {
+            for (int i = 0; i < 3; i++) {
+                if (row[i].equals(row[i + 1]) && row[i + 1].equals(row[i + 2]) && row[i + 2].equals(row[i + 3])) {
+                    return true;
+                }
+            }
+        }
+
+        // Verificar verticalmente
+        for (int column = 0; column < 6; column++) {
+            for (int i = 0; i < 3; i++) {
+                if (dnaMatrix[i][column].equals(dnaMatrix[i + 1][column]) &&
+                        dnaMatrix[i + 1][column].equals(dnaMatrix[i + 2][column]) &&
+                        dnaMatrix[i + 2][column].equals(dnaMatrix[i + 3][column])) {
+                    return true;
+                }
+            }
+        }
+
+        // Verificar diagonales de arriba a abajo
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (dnaMatrix[i][j].equals(dnaMatrix[i + 1][j + 1]) &&
+                        dnaMatrix[i + 1][j + 1].equals(dnaMatrix[i + 2][j + 2]) &&
+                        dnaMatrix[i + 2][j + 2].equals(dnaMatrix[i + 3][j + 3])) {
+                    return true;
+                }
+            }
+        }
+
+        // Verificar diagonales de abajo a arriba
+        for (int i = 0; i < 3; i++) {
+            for (int j = 3; j < 6; j++) {
+                if (dnaMatrix[i][j].equals(dnaMatrix[i + 1][j - 1]) &&
+                        dnaMatrix[i + 1][j - 1].equals(dnaMatrix[i + 2][j - 2]) &&
+                        dnaMatrix[i + 2][j - 2].equals(dnaMatrix[i + 3][j - 3])) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean validateBase(String base) {
+        return base.matches("[ATCG]");
+    }
+
+    public static void main(String[] args) {
+        Scanner leer = new Scanner(System.in);
+        List<String> listDNASequence = new ArrayList<>();
+
+        // Solicitar al usuario que ingrese las secuencias de ADN
+        for (int i = 0; i < 6; i++) {
+            while (true) {
+                System.out.print("Ingresa una secuencia de adn de 6 bases nitrogenadas(A,T,C,G): ");
+                String DNASequence = leer.next().toUpperCase();
+
+                // Validar que la entrada tenga 6 caracteres y que cada carácter sea A, T, C o G
+                if (DNASequence.length() == 6 && DNASequence.chars().allMatch(c -> validateBase(String.valueOf((char) c)))) {
+                    listDNASequence.add(DNASequence);
+                    break;
+                } else {
+                    System.out.println("Secuencia de ADN inválida. Por favor, ingresa una secuencia válida.");
+                }
+            }
+        }
+
+        // Llamar a la función isMutant con las secuencias de ADN ingresadas y muestra el resultado
+        boolean sample = isMutant(listDNASequence);
+        if (sample) {
+            System.out.println("La prueba de ADN ha resultado positiva, es mutante.");
+        } else {
+            System.out.println("La prueba de ADN ha resultado negativa, es humano.");
+        }
+    }
+}
